@@ -3,37 +3,33 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
+use App\Enums\UserRole;
 
 class CreateUserRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'first_name' => ['require', 'string', 'max:225'] 
-            'last_name' => ['require', 'string', 'max:225']
-            'email' => ['require', 'email', 'max:225']
-            'password' => ['require']
-            'birth_date' => ['require', 'date']
-            'role' => ['require']
+            'first_name' => ['required', 'string', 'max:225'],
+            'last_name' => ['required', 'string', 'max:225'],
+            'email' => ['required', 'email', 'max:225', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+            'birth_date' => ['required', 'date'],
+            'role' => ['required', Rule::in(['TEACHER', 'STUDENT'])]
         ];
     }
 
-    public function passedValidation(): void{
-        $this->replace([
-            'password'=> Hash::make($this->get('password')) 
-            ])
+    public function passedValidation(): void
+    {
+        $this->merge([
+            'password' => Hash::make($this->password)
+        ]);
     }
 }

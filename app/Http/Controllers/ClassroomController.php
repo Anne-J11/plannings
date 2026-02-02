@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Classroom;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\CreateClassroomRequest;
+use App\Http\Requests\UpdateClassroomRequest;
 
 class ClassroomController extends Controller
 {
@@ -15,23 +15,28 @@ class ClassroomController extends Controller
     }
 
     // POST /classrooms
-    public function store(Request $request)
+    public function store(CreateClassroomRequest $request)
     {
-        $classroom = Classroom::create($data);
-
+        $classroom = Classroom::create($request->validated());
         return response()->json($classroom, 201);
     }
 
-    public function show(Classroom $classroom){
+    // GET /classrooms/{classroom}
+    public function show(Classroom $classroom)
+    {
         return response()->json($classroom);
     }
 
-    public function destroy(Classroom $classroom){
+    // DELETE /classrooms/{classroom}
+    public function destroy(Classroom $classroom)
+    {
         $classroom->delete();
-        return response()->json(null);
+        return response()->json(null, 204);
     }
 
-    public function update(UpdateClassroomRequest $request, Classroom $classroom){
+    // PUT/PATCH /classrooms/{classroom}
+    public function update(UpdateClassroomRequest $request, Classroom $classroom)
+    {
         $classroom->update($request->validated());
         return response()->json($classroom);
     }

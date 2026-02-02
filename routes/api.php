@@ -1,57 +1,47 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ClassroomController;
+use App\Http\Controllers\SubjectsController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\UserController;
 
-/*Route::get('/test', function () {
-    return response()->json([
-        'message' => 'La route fonctionne'
-    ]);
+// Classrooms routes
+Route::prefix('classrooms')->group(function () {
+    Route::get('/', [ClassroomController::class, 'index']);
+    Route::post('/', [ClassroomController::class, 'store']);
+    Route::get('/{classroom}', [ClassroomController::class, 'show']);
+    Route::delete('/{classroom}', [ClassroomController::class, 'destroy']);
+    Route::patch('/{classroom}', [ClassroomController::class, 'update']);
 });
 
-Route::get('/test-request', function (Request $request) {
-    return response()->json([
-        'params' => $request->all()
-    ]);
-});*/
-
-Route::get('/users/{id}', function (int $id) {
-    return response()->json([
-        'user_id' => $id
-    ]);
+// Subjects routes
+Route::prefix('subjects')->group(function () {
+    Route::get('/', [SubjectsController::class, 'index']);
+    Route::post('/', [SubjectsController::class, 'store']);
+    Route::get('/{subject}', [SubjectsController::class, 'show']);
+    Route::delete('/{subject}', [SubjectsController::class, 'destroy']);
+    Route::put('/{subject}', [SubjectsController::class, 'update']);
 });
 
-//Classromms routes
-Route::prefix('/classrooms') ->group(function () {
-    Route::get('classrooms', [\App\Http\Controllers\ClassroomController::class, 'index']);
-    Route::post('classrooms', [\App\Http\Controllers\ClassroomController::class, 'store']);
-    Route::get('classrooms/{id}', [\App\Http\Controllers\ClassroomController::class, 'show']);
-    Route::delete('classrooms/{id}', [\App\Http\Controllers\ClassroomController::class, 'destroy']);
-    Route::patch('classrooms/{id}', [\App\Http\Controllers\ClassroomController::class, 'update']);
-});
-//Subjects routes
-Route::prefix('/subjects') ->group(function () {
-    Route::get('subjects', [\App\Http\Controllers\SubjectsController::class, 'index']);
-    Route::post('subjects', [\App\Http\Controllers\SubjectsController::class, 'store']);
-    Route::delete('subjects/{id}', [\App\Http\Controllers\SubjectsController::class, 'destroy']);
-    Route::put('subjects/{id}', [\App\Http\Controllers\SubjectsController::class, 'update']);
-});
 // Courses routes
-Route::prefix('/courses')->group(function () {
-    Route::get('/', [\App\Http\Controllers\CourseController::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\CourseController::class, 'store']);
-    Route::get('/{course}', [\App\Http\Controllers\CourseController::class, 'show']);
-    Route::delete('/{course}', [\App\Http\Controllers\CourseController::class, 'destroy']);
-    Route::patch('/{course}', [\App\Http\Controllers\CourseController::class, 'update']);
-});
-// User routes
-Route::prefix('/user')->group(function () {
-    Route::get('/', [\App\Http\Controllers\UserController::class, 'index']);
-    Route::post('/', [\App\Http\Controllers\UserController::class, 'store']);
-    Route::get('/{user}', [\App\Http\Controllers\UserController::class, 'show']);
-    Route::delete('/{user}', [\App\Http\Controllers\UserController::class, 'destroy']);
-    Route::patch('/{user}', [\App\Http\Controllers\UserController::class, 'update']);
+Route::prefix('courses')->group(function () {
+    Route::get('/', [CourseController::class, 'index']);
+    Route::post('/', [CourseController::class, 'store']);
+    Route::get('/{course}', [CourseController::class, 'show']);
+    Route::delete('/{course}', [CourseController::class, 'destroy']);
+    Route::patch('/{course}', [CourseController::class, 'update']);
+    
+    // Relations avec les utilisateurs
+    Route::put('/{course}/users/{user}', [CourseController::class, 'addUserToCourse']);
+    Route::post('/{course}/users', [CourseController::class, 'syncUsersToCourse']);
 });
 
-Route::put('courses/{course}/users/{user}', [CourseController::class, 'addUserToCourse']);
-Route::post('courses/{course}/users', [CourseController::class, 'syncUsersToCourse']);
+// Users routes
+Route::prefix('users')->group(function () {
+    Route::get('/', [UserController::class, 'index']);
+    Route::post('/', [UserController::class, 'store']);
+    Route::get('/{user}', [UserController::class, 'show']);
+    Route::delete('/{user}', [UserController::class, 'destroy']);
+    Route::patch('/{user}', [UserController::class, 'update']);
+});

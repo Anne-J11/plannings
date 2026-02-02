@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Enums\UserRole;
@@ -14,9 +13,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name', 
         'email',
         'password',
+        'birth_date',
+        'role'
     ];
 
     protected $hidden = [
@@ -30,7 +32,18 @@ class User extends Authenticatable
         'role' => UserRole::class    
     ];
 
-    public function courses(): BelongsToMany    {       
+    public function courses(): BelongsToMany
+    {       
         return $this->belongsToMany(Course::class)->withTimestamps();    
+    }
+
+    public function isTeacher(): bool
+    {
+        return $this->role === UserRole::Teacher;
+    }
+
+    public function isStudent(): bool
+    {
+        return $this->role === UserRole::Student;
     }
 }

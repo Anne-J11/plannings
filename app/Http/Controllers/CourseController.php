@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\User;
 use App\Http\Requests\CreateCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use App\Http\Requests\SyncUsersToCourseRequest;
+use App\Http\Resources\CourseResource;
 
 class CourseController extends Controller
 {
     // GET /courses
     public function index()
     {
-        $courses = (['subject', 'classroom']);
-        return CourseResource::collection(Course::with(relations:'user')->get());
+        $courses = Course::with(['subject', 'classroom', 'users'])->get();
+        return CourseResource::collection($courses);
     }
 
     // POST /courses
@@ -21,7 +24,7 @@ class CourseController extends Controller
         $course = Course::create($request->validated());
         $course->load(['subject', 'classroom']);
         
-        return new CourseResource($course, 201);
+        return new CourseResource($course);
     }
 
     // GET /courses/{course}
@@ -47,11 +50,14 @@ class CourseController extends Controller
         return response()->json(null, 204);
     }
 
-    public function addUserToCourse(Course $course, User $user)    {
+    // PUT /courses/{course}/users/{user}
+    public function addUserToCourse(Course $course, User $user)
+    {
         $course->users()->syncWithoutDetaching($user->id);
         return new CourseResource($course->load('users'));
     }
 
+    // POST /courses/{course}/users
     public function syncUsersToCourse(Course $course, SyncUsersToCourseRequest $request)
     {
         $course->users()->sync($request->user_ids);
