@@ -11,8 +11,8 @@ class CourseController extends Controller
     // GET /courses
     public function index()
     {
-        $courses = Course::with(['subject', 'classroom'])->get();
-        return response()->json($courses);
+        $courses = (['subject', 'classroom']);
+        return CourseResource::collection(Course::with(relations:'user')->get());
     }
 
     // POST /courses
@@ -21,14 +21,14 @@ class CourseController extends Controller
         $course = Course::create($request->validated());
         $course->load(['subject', 'classroom']);
         
-        return response()->json($course, 201);
+        return new CourseResource($course, 201);
     }
 
     // GET /courses/{course}
     public function show(Course $course)
     {
         $course->load(['subject', 'classroom', 'users']);
-        return response()->json($course);
+        return new CourseResource($course);
     }
 
     // PUT/PATCH /courses/{course}
@@ -37,7 +37,7 @@ class CourseController extends Controller
         $course->update($request->validated());
         $course->load(['subject', 'classroom']);
         
-        return response()->json($course);
+        return new CourseResource($course);
     }
 
     // DELETE /courses/{course}
@@ -45,5 +45,16 @@ class CourseController extends Controller
     {
         $course->delete();
         return response()->json(null, 204);
+    }
+
+    public function addUserToCourse(Course $course, User $user)    {
+        $course->users()->syncWithoutDetaching($user->id);
+        return new CourseResource($course->load('users'));
+    }
+
+    public function syncUsersToCourse(Course $course, SyncUsersToCourseRequest $request)
+    {
+        $course->users()->sync($request->user_ids);
+        return new CourseResource($course->load('users'));
     }
 }
